@@ -1,0 +1,152 @@
+<div class="container py-5">
+  <!-- Encabezado -->
+  <div class="text-center mb-5">
+    <h2 class="fw-bold text-primary mb-2">
+      <i class="bi bi-file-earmark-text me-2"></i>Gestión de TRD
+    </h2>
+    <p class="text-muted">Control y administración de versiones documentales</p>
+    <hr class="mx-auto opacity-25" style="width: 100px;">
+  </div>
+
+  <div class="row justify-content-center">
+    <!-- Formulario -->
+    <div class="col-lg-10 col-xl-8">
+      <div class="card border-0 shadow-lg rounded-4 mb-5">
+        <div class="card-header text-white text-center py-3 rounded-top-4"
+             style="background: linear-gradient(135deg, #1976D2, #2196F3);">
+          <h5 class="mb-0 fw-semibold">
+            <i class="bi bi-plus-circle me-2"></i>Nueva Versión TRD
+          </h5>
+        </div>
+
+        <div class="card-body p-4 bg-light">
+          <form (ngSubmit)="guardarTrdVersion($event)" autocomplete="off" novalidate>
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Nombre</label>
+              <input type="text" class="form-control"
+                     [(ngModel)]="trdVersion.nombre"
+                     name="nombre" required
+                     placeholder="Ingrese el nombre de la versión">
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Vigencia Desde</label>
+              <input type="date" class="form-control"
+                     [(ngModel)]="trdVersion.vigenciaDesde"
+                     name="vigenciaDesde" required>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Vigencia Hasta</label>
+              <input type="date" class="form-control"
+                     [(ngModel)]="trdVersion.vigenciaHasta"
+                     name="vigenciaHasta">
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Estado</label>
+              <select class="form-select"
+                      [(ngModel)]="trdVersion.estado"
+                      name="estado" required>
+                <option value="BORRADOR">BORRADOR</option>
+                <option value="ACTIVO">ACTIVO</option>
+                <option value="HISTORICA">HISTORICA</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Archivo</label>
+              <input id="archivo" type="file" class="form-control"
+                     (change)="onFileSelected($event)"
+                     name="archivo" required>
+              <div *ngIf="selectedFile" class="mt-2 text-success small">
+                <i class="bi bi-check-circle-fill me-1"></i>
+                Archivo seleccionado: {{ selectedFile.name }}
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">
+              <i class="bi bi-save me-1"></i>Guardar
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabla de versiones -->
+    <div class="col-lg-10 col-xl-8">
+      <div class="card border-0 shadow rounded-4">
+        <div class="card-header bg-white py-3 border-bottom-0">
+          <div class="d-flex justify-content-between align-items-center">
+            <h5 class="fw-semibold mb-0">
+              <i class="bi bi-clock-history me-2 text-primary"></i>Historial de versiones
+            </h5>
+            <span *ngIf="trdVersiones.length > 0"
+                  class="badge bg-primary bg-opacity-10 text-primary border border-primary">
+              {{ trdVersiones.length }} versiones
+            </span>
+          </div>
+        </div>
+
+        <div class="card-body p-0">
+          <div class="table-responsive" *ngIf="trdVersiones.length > 0; else sinRegistros">
+            <table class="table align-middle mb-0 table-hover">
+              <thead class="table-light">
+                <tr>
+                  <th>ID</th>
+                  <th>Nombre</th>
+                  <th>Vigencia desde</th>
+                  <th>Vigencia hasta</th>
+                  <th class="text-center">Estado</th>
+                  <th class="text-end">Archivo</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let trd of trdVersiones">
+                  <td class="text-muted">#{{ trd.id }}</td>
+                  <td>{{ trd.nombre }}</td>
+                  <td>{{ trd.vigenciaDesde | date:'mediumDate' }}</td>
+                  <td>{{ trd.vigenciaHasta ? (trd.vigenciaHasta | date:'mediumDate') : 'Vigente' }}</td>
+                  <td class="text-center">
+                    <span class="badge rounded-pill px-3 py-2"
+                          [ngClass]="{
+                            'bg-success-subtle text-success': trdVersion.estado === 'ACTIVO',
+                            'bg-secondary-subtle text-secondary': trd.estado === 'HISTORICA',
+                            'bg-warning-subtle text-warning': trd.estado === 'BORRADOR'
+                          }">
+                      <i class="bi me-1"
+                         [ngClass]="{
+                           'bi-check-circle': trdVersion.estado === 'ACTIVO',
+                           'bi-archive': trd.estado === 'HISTORICA',
+                           'bi-pencil-square': trd.estado === 'BORRADOR'
+                         }"></i>
+                      {{ trd.estado | titlecase }}
+                    </span>
+                  </td>
+                  <td class="text-end">
+                    <a *ngIf="trd.nombreArchivo; else sinArchivo"
+                       [href]="getDownloadUrl(trd.id)"
+                       class="btn btn-sm btn-outline-primary rounded-pill px-3"
+                       target="_blank">
+                      <i class="bi bi-download me-1"></i>{{ trd.nombreArchivo }}
+                    </a>
+                    <ng-template #sinArchivo>
+                      <span class="text-muted">—</span>
+                    </ng-template>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <ng-template #sinRegistros>
+            <div class="text-center py-5 text-muted">
+              <i class="bi bi-inbox display-4 mb-2"></i>
+              <p class="mb-0">No hay versiones registradas aún</p>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
