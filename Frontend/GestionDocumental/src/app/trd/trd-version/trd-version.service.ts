@@ -7,23 +7,34 @@ import { TrdVersion } from './trd-version.model';
   providedIn: 'root'
 })
 export class TrdVersionService {
-  // URL base que coincide con tu backend Spring Boot
-  private readonly API_BASE_URL = 'http://localhost:8080/api/trd/version';
+  // URL base apuntando a tu Backend de Java
+  private API_BASE_URL = 'http://localhost:8080/api/trd/version';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
-  // Obtener todas las versiones TRD
+  /**
+   * Obtiene la lista de versiones (GET)
+   */
   obtenerVersiones(): Observable<TrdVersion[]> {
-    return this.http.get<TrdVersion[]>(this.API_BASE_URL);
+    // Si tu controlador principal es TrdController, la URL de lista es diferente
+    // Ajustamos para apuntar a /api/trd que es donde está la lista según tu Java
+    return this.http.get<TrdVersion[]>('http://localhost:8080/api/trd');
   }
 
-  // Crear o subir una nueva versión TRD (usa multipart/form-data)
+  /**
+   * Sube una nueva versión con archivo (POST)
+   */
   crearVersion(formData: FormData): Observable<TrdVersion> {
+    // Este apunta a TrdVersionController que maneja la subida
     return this.http.post<TrdVersion>(this.API_BASE_URL, formData);
   }
 
-  // Generar la URL para descargar un archivo
+  /**
+   * Genera la URL para descargar el archivo
+   */
   getArchivoUrl(id: number): string {
-    return `${this.API_BASE_URL}/${id}/descargar`;
+    // Ajusta esto según la ruta real de descarga en tu backend si existe,
+    // o déjalo así si planeas implementarlo luego.
+    return `${this.API_BASE_URL}/${id}/archivo`; 
   }
 }

@@ -1,15 +1,14 @@
-package com.app.gestiondocumental.repository; // <-- PAQUETE CORREGIDO
+package com.app.gestiondocumental.repository;
 
-// --- IMPORT CORREGIDO ---
 import com.app.gestiondocumental.model.FileRecord;
+import com.app.gestiondocumental.model.FileStatus; // Asegúrate de importar el Enum
 import org.springframework.data.jpa.repository.JpaRepository;
-
+import java.util.List;
 import java.util.Optional;
 
-// Esta es una interfaz de Spring Data JPA, se encarga de las consultas a la BD
 public interface FileRecordRepository extends JpaRepository<FileRecord, Long> {
-
-    // Spring Data JPA crea automáticamente la consulta SQL para este método
-    // basado en el nombre ("findByMd5")
     Optional<FileRecord> findByMd5(String md5);
+
+    // --- NUEVO MÉTODO ---
+    List<FileRecord> findByStatus(FileStatus status);
 }

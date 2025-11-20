@@ -1,0 +1,67 @@
+<div class="container py-5">
+  <div class="text-center mb-5">
+    <h2 class="fw-bold text-danger mb-2">
+      <i class="bi bi-check-square me-2"></i>Validación Manual
+    </h2>
+    <p class="text-muted">Corrige los archivos que la IA no pudo clasificar con seguridad</p>
+    <hr class="mx-auto opacity-25" style="width: 100px;">
+  </div>
+
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+      <div class="card border-0 shadow-lg rounded-4">
+        <div class="card-body p-0">
+          
+          <div class="table-responsive">
+            <table class="table align-middle mb-0 table-hover">
+              <thead class="table-light">
+                <tr>
+                  <th class="ps-4">Archivo</th>
+                  <th>Problema (IA)</th>
+                  <th>Categoría Correcta</th>
+                  <th class="text-end pe-4">Acción</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let p of pendientes">
+                  <td class="ps-4">
+                    <div class="fw-bold text-primary">{{ p.originPath.split('\\').pop() }}</div>
+                    <small class="text-muted">{{ (p.size / 1024) | number:'1.0-0' }} KB</small>
+                  </td>
+                  <td>
+                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle">
+                      <i class="bi bi-robot me-1"></i> {{ p.cause }}
+                    </span>
+                  </td>
+                  <td>
+                    <select class="form-select form-select-sm" [(ngModel)]="p.nuevaCategoria">
+                      <option value="" disabled selected>Seleccionar...</option>
+                      <option *ngFor="let cat of categorias" [value]="cat">{{ cat }}</option>
+                    </select>
+                  </td>
+                  <td class="text-end pe-4">
+                    <button class="btn btn-sm btn-success rounded-pill px-3" 
+                            (click)="validar(p)" 
+                            [disabled]="!p.nuevaCategoria">
+                      <i class="bi bi-check-lg me-1"></i> Validar
+                    </button>
+                  </td>
+                </tr>
+
+                <tr *ngIf="pendientes.length === 0">
+                  <td colspan="4" class="text-center py-5">
+                    <div class="text-muted">
+                      <i class="bi bi-clipboard-check display-4 d-block mb-3"></i>
+                      <p class="mb-0">¡Todo limpio! No hay archivos pendientes de validación.</p>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
